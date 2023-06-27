@@ -585,6 +585,13 @@ class DBManager{
         return $this;
     }
 
+    private function escapeColumnName(string $columnName): string{
+        return match ($this->_getDbConfig()->getDbType()){
+            DBConfig::MYSQL => '`' . $columnName . '`',
+            DBConfig::POSTGRESQL => '"' . $columnName . '"'
+        };
+    }
+
     /* Operators */
 
     /**
@@ -628,7 +635,7 @@ class DBManager{
                                         $sub_bindings[':w_' . $i . '_' . $j] = ($ignorecase && is_string($sub_value) ? strtolower($sub_value) : $sub_value);
                                         $j++;
                                     }
-                                    $where_string = ($ignorecase ? 'LOWER(' : '') . '`' . $value->getKey() . '`' . ($ignorecase ? ')' : '') . ' ' . $value->getOperator() . ' (' . join(', ', array_keys($sub_bindings)) . ')';
+                                    $where_string = ($ignorecase ? 'LOWER(' : '') . $this->escapeColumnName($value->getKey()) . ($ignorecase ? ')' : '') . ' ' . $value->getOperator() . ' (' . join(', ', array_keys($sub_bindings)) . ')';
                                     $bindings = array_merge($bindings, $sub_bindings);
                                 }
                             } else {
@@ -646,10 +653,10 @@ class DBManager{
                             }
                             if($this->isSmartParser())
                                 $value->setValue((new DBSmartParser($value->getKey(), $value->getValue()))->parse()->getValue());
-                            $where_string = ($ignorecase ? 'LOWER(' : '') . '`' . $value->getKey() . '`' . ($ignorecase ? ')' : '') . ' ' . $value->getOperator() . ' ' . $value_key;
+                            $where_string = ($ignorecase ? 'LOWER(' : '') . $this->escapeColumnName($value->getKey()) . ($ignorecase ? ')' : '') . ' ' . $value->getOperator() . ' ' . $value_key;
                             $bindings[':w_' . $i] = ($ignorecase && is_string($param) ? strtolower($param) : $param);
                         }else{
-                            $where_string = '`' . $value->getKey() . '` ' . $value->getOperator() . ' null';
+                            $where_string = $this->escapeColumnName($value->getKey()) . ' ' . $value->getOperator() . ' null';
                         }
                     }
                     if($i !== sizeof($where)-1){
@@ -690,7 +697,7 @@ class DBManager{
                 if($column !== null){
                     $value_key = $column->transformInsertValueKey($value_key);
                 }
-                $setter[] = '`' . $key . '` = ' . $value_key;
+                $setter[] = $this->escapeColumnName($key) . ' = ' . $value_key;
                 if($this->isSmartParser())
                     $value = (new DBSmartParser($key, $value))->parse()->getValue();
                 /*if($this->isEncodeHtmlspecialchars()){
@@ -699,7 +706,7 @@ class DBManager{
                 $bindings[':s_' . $i] = $value;
                 $i++;
             }else{
-                $setter[] = '`' . $key . '` = null';
+                $setter[] = $this->escapeColumnName($key) . ' = null';
             }
         }
         return array(
@@ -731,7 +738,8 @@ class DBManager{
                 $columns = array_filter($this->getTableStructure()->getColumns(), fn($column) => in_array($column->getName(), $columns));
             }
             foreach($columns as $column){
-                $parsed_columns[] = $column->transformResponseValueKey('`' . $column->getName() . '`') . ' AS `' . $column->getName() . '`';
+                $transformer = $column->transformResponseValueKey($this->escapeColumnName($column->getName()));
+                $parsed_columns[] = $transformer . ($transformer === $this->escapeColumnName($column->getName()) ? '' : ' AS ' . $this->escapeColumnName($column->getName()));
             }
             $selector = join(', ', $parsed_columns);
         }else{
@@ -742,7 +750,7 @@ class DBManager{
             }
         }
         $where['question'] .= $this->buildSelectQuerySuffix();
-        $query = 'SELECT ' . $selector . ' FROM `' . $this->getTable() . '`' . $where['question'];
+        $query = 'SELECT ' . $selector . ' FROM ' . $this->escapeColumnName($this->getTable()) . $where['question'];
         return array(
             'query' => $query,
             'bindings' => $bindings
@@ -772,7 +780,7 @@ class DBManager{
         $where = $this->buildWhere();
         $set = $this->buildSet($set);
         $bindings = array_merge($where['bindings'], $set['bindings']);
-        $query = 'UPDATE `' . $this->getTable() . '`' . $set['setter'] . $where['question'];
+        $query = 'UPDATE ' . $this->escapeColumnName($this->getTable()) . $set['setter'] . $where['question'];
         return array(
             'query' => $query,
             'bindings' => $bindings
@@ -794,7 +802,7 @@ class DBManager{
         $bindings = array();
         $i = 0;
         foreach ($keys as $key){
-            $insert_keys[] = '`' . $key . '`';
+            $insert_keys[] = $this->escapeColumnName($key);
             $value_key = ':i_' . $i;
             $column = $this->getTableStructure()?->getColumn($key);
 
@@ -821,7 +829,7 @@ class DBManager{
         }
         if($this->getTableStructure() !== null){
             foreach(array_filter($this->getTableStructure()->getColumns(), fn($column) => !in_array($column->getName(), $keys)) as $column){
-                $insert_keys[] = '`' . $column->getName() . '`';
+                $insert_keys[] = $this->escapeColumnName($column->getName());
                 $value_key = ':i_' . $i;
 
                 $default = $column->generateDefault();
@@ -848,7 +856,7 @@ class DBManager{
     ])]
     private function buildDeleteQuery(): array{
         $where = $this->buildWhere();
-        $query = 'DELETE FROM `' . $this->getTable() . '`' . $where['question'];
+        $query = 'DELETE FROM ' . $this->escapeColumnName($this->getTable()) . $where['question'];
         return array(
             'query' => $query,
             'bindings' => $where['bindings']
@@ -897,7 +905,7 @@ class DBManager{
         $where = $this->buildWhere();
         $bindings = $where['bindings'];
         $where['question'] .= $this->buildSelectQuerySuffix();
-        $query = 'SELECT COUNT(*) AS `row_count` FROM `' . $this->getTable() . '`' . $where['question'];
+        $query = 'SELECT COUNT(*) AS ' . $this->escapeColumnName('row_count') . ' FROM ' . $this->escapeColumnName($this->getTable()) . $where['question'];
 
         $this->runStatement($query, $bindings);
         $callback = $this->fetch();
@@ -1025,7 +1033,7 @@ class DBManager{
      * @throws SQLException
      */
     public function tableExist(): bool{
-        return $this->execute('SELECT COUNT(*) AS `exist` FROM `INFORMATION_SCHEMA`.`TABLES` WHERE `TABLE_SCHEMA` = \'' . $this->_getDbConfig()->getDbName() . '\' AND `TABLE_NAME` = \'' . $this->getTable() . '\'')->fetch()['exist'] == 1;
+        return $this->execute('SELECT COUNT(*) AS ' . $this->escapeColumnName('exist') . ' FROM ' . $this->escapeColumnName('INFORMATION_SCHEMA') . '.' . $this->escapeColumnName('TABLES') . ' WHERE ' . $this->escapeColumnName('TABLE_SCHEMA') . ' = \'' . $this->_getDbConfig()->getDbName() . '\' AND ' . $this->escapeColumnName('TABLE_NAME') . ' = \'' . $this->getTable() . '\'')->fetch()['exist'] == 1;
     }
 
     /**
@@ -1036,12 +1044,12 @@ class DBManager{
      * @throws SQLException
      */
     public function addColumn(DBColumn $column, string|DBColumn|null $after = null, bool $first = false): bool{
-        $callback = $this->execute('ALTER TABLE `' . $this->getTable() . '` ADD ' . $column->getColumnString() .
-            ($first ? ' FIRST' : ($after !== null ? ' AFTER `' . ($after instanceof DBColumn ? $after->getName() : $after) . '`' : ''))
+        $callback = $this->execute('ALTER TABLE ' . $this->escapeColumnName($this->getTable()) . ' ADD ' . $column->getColumnString() .
+            ($first ? ' FIRST' : ($after !== null ? ' AFTER ' . $this->escapeColumnName(($after instanceof DBColumn ? $after->getName() : $after)) : ''))
         )->getStatus();
         if($callback){
             foreach($column->getColumnExtras() as $extra){
-                $this->execute('ALTER TABLE `' . $this->getTable() . '` ADD ' . $extra);
+                $this->execute('ALTER TABLE ' . $this->escapeColumnName($this->getTable()) . ' ADD ' . $extra);
             }
         }
         return $callback;
@@ -1053,7 +1061,7 @@ class DBManager{
      * @throws SQLException
      */
     public function createTable(DBTable $table): bool{
-        $query = 'CREATE TABLE ' . $table->getName() . '(';
+        $query = 'CREATE TABLE ' . $this->escapeColumnName($table->getName()) . '(';
         $columns = array();
         $extras = array();
         foreach($table->getColumns() as $column){

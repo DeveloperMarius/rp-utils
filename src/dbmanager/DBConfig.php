@@ -8,6 +8,9 @@ use PDOException;
 
 class DBConfig{
 
+    const MYSQL = 'mysql';
+    const POSTGRESQL = 'pgsql';
+
     /**
      * @var DBConfig $default - Default DBConfig
      */
@@ -26,7 +29,7 @@ class DBConfig{
      * @param string|null $model_namespace
      * @param string $db_type
      */
-    public function __construct(private string $db_name, private string $db_host, private string $db_username, private string $db_password, private ?string $model_namespace = null, #[ExpectedValues(['mysql', 'pgsql'])] private string $db_type = 'mysql'){
+    public function __construct(private string $db_name, private string $db_host, private string $db_username, private string $db_password, private ?string $model_namespace = null, #[ExpectedValues([self::MYSQL, self::POSTGRESQL])] private string $db_type = self::MYSQL){
 
     }
 
@@ -78,7 +81,7 @@ class DBConfig{
      */
     public function getConnection(): PDO {
         if($this->connection == null){
-            $dsn = $this->getDbType() . ':host=' . $this->getDbHost() . ';dbname=' . $this->getDbName() . ';charset=utf8mb4';
+            $dsn = $this->getDbType() . ':host=' . $this->getDbHost() . ';dbname=' . $this->getDbName() . ($this->getDbType() === self::MYSQL ? ';charset=utf8mb4' : '');
             $this->connection = new PDO($dsn, $this->getDbUsername(), $this->getDbPassword());
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
