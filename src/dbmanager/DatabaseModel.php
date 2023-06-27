@@ -800,8 +800,8 @@ abstract class DatabaseModel implements JsonSerializable{
                             $column->applyBeforeResponse(DBFunction::BIN_TO_UUID);
                             $column->applyBeforeInsert(DBFunction::UUID_TO_BIN);
                         }
-                        if(sizeof(array_filter($attributes, fn($attribute) => $attribute->getName() === PrimaryKeyProperty::class)) > 0)
-                            $column->setDefaultGenerator(fn() => Util::generateUuid());
+                        //if(sizeof(array_filter($attributes, fn($attribute) => $attribute->getName() === PrimaryKeyProperty::class)) > 0)
+                        //    $column->setDefaultGenerator(fn() => Util::generateUuid());
                         break;
                     case ReadonlyProperty::class:
                         //Throw error on before insert

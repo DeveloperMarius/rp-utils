@@ -15,7 +15,7 @@ class UUIDv4Property
     /**
      * @param bool $binary
      */
-    public function __construct(private readonly bool $binary = true){}
+    public function __construct(private readonly bool $binary = false){}
 
     /**
      * @return bool
