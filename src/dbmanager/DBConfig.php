@@ -26,7 +26,7 @@ class DBConfig{
      * @param string|null $model_namespace
      * @param string $db_type
      */
-    public function __construct(private string $db_name, private string $db_host, private string $db_username, private string $db_password, private ?string $model_namespace = null, #[ExpectedValues(['mysql', 'postgresql'])] private string $db_type = 'mysql'){
+    public function __construct(private string $db_name, private string $db_host, private string $db_username, private string $db_password, private ?string $model_namespace = null, #[ExpectedValues(['mysql', 'pgsql'])] private string $db_type = 'mysql'){
 
     }
 
