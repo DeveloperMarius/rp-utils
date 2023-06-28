@@ -6,7 +6,7 @@ use Somnambulist\Components\Validation\Rules\Regex;
 
 class ZipValidatorRule extends Regex{
 
-    protected string $message = ':attribute ist keine valide Deutsche Postleitzahl';
+    protected string $message = 'rule.zip';
 
     public function check($value): bool
     {

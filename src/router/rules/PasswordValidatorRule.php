@@ -6,7 +6,7 @@ use Somnambulist\Components\Validation\Rule;
 
 class PasswordValidatorRule extends Rule{
 
-    protected string $message = ':attribute entspricht nicht den Passwort anforderungen';
+    protected string $message = 'rule.password';
     protected array $fillableParams = ['password_type'];
 
     public function check($value): bool

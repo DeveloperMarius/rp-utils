@@ -14,10 +14,10 @@ if(class_exists('\Pecee\SimpleRouter\Route\Route')){
     \Pecee\Http\Input\InputValidator::getFactory()->addRule('zip', new \utils\router\rules\ZipValidatorRule());
     \Pecee\Http\Input\InputValidator::getFactory()->registerLanguageMessages('de');
     \Pecee\Http\Input\InputValidator::getFactory()->messages()->add('de', array(
-        'birthday' => ':attribute ist kein valides Geburtsdatum',
-        'model' => ':attribute existiert nicht',
-        'password' => ':attribute entspricht nicht den Passwort anforderungen.',
-        'phone' => ':attribute ist keine valide Deutsche Telefonnummer',
-        'zip' => ':attribute ist keine valide Deutsche Postleitzahl'
+        'rule.birthday' => ':attribute ist kein valides Geburtsdatum',
+        'rule.model' => ':attribute existiert nicht',
+        'rule.password' => ':attribute entspricht nicht den Passwort anforderungen.',
+        'rule.phone' => ':attribute ist keine valide Deutsche Telefonnummer',
+        'rule.zip' => ':attribute ist keine valide Deutsche Postleitzahl'
     ));
 }

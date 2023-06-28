@@ -6,7 +6,7 @@ use Somnambulist\Components\Validation\Rules\Regex;
 
 class PhoneValidatorRule extends Regex{
 
-    protected string $message = ':attribute ist keine valide Deutsche Telefonnummer';
+    protected string $message = 'rule.phone';
 
     public function check($value): bool
     {

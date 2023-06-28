@@ -7,7 +7,7 @@ use utils\dbmanager\DBManager;
 
 class ModelValidatorRule extends Rule{
 
-    protected string $message = ':attribute existiert nicht';
+    protected string $message = 'rule.model';
     protected array $fillableParams = ['model'];
 
     public function check($value): bool

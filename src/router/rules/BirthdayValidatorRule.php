@@ -6,6 +6,6 @@ use Somnambulist\Components\Validation\Rules\Date;
 
 class BirthdayValidatorRule extends Date{
 
-    protected string $message = ':attribute ist kein valides Geburtsdatum';
+    protected string $message = 'rule.birthday';
 
 }
