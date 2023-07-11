@@ -29,7 +29,7 @@ class DBConfig{
      * @param string|null $model_namespace
      * @param string $db_type
      */
-    public function __construct(private string $db_name, private string $db_host, private string $db_username, private string $db_password, private ?string $model_namespace = null, #[ExpectedValues([self::MYSQL, self::POSTGRESQL])] private string $db_type = self::MYSQL){
+    public function __construct(private string $db_name, private string $db_host, private int $db_port, private string $db_username, private string $db_password, private ?string $model_namespace = null, #[ExpectedValues([self::MYSQL, self::POSTGRESQL])] private string $db_type = self::MYSQL){
 
     }
 
@@ -45,6 +45,13 @@ class DBConfig{
      */
     public function getDbHost(): string{
         return $this->db_host;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDbPort(): int{
+        return $this->db_port;
     }
 
     /**
@@ -81,7 +88,7 @@ class DBConfig{
      */
     public function getConnection(): PDO {
         if($this->connection == null){
-            $dsn = $this->getDbType() . ':host=' . $this->getDbHost() . ';dbname=' . $this->getDbName() . ($this->getDbType() === self::MYSQL ? ';charset=utf8mb4' : '');
+            $dsn = $this->getDbType() . ':host=' . $this->getDbHost() . ($this->getDbPort() !== null ? ';port=' . $this->getDbPort() : '') . ';dbname=' . $this->getDbName() . ($this->getDbType() === self::MYSQL ? ';charset=utf8mb4' : '');
             $this->connection = new PDO($dsn, $this->getDbUsername(), $this->getDbPassword());
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
