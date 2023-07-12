@@ -828,14 +828,14 @@ class DBManager{
             $i++;
         }
         if($this->getTableStructure() !== null){
-            foreach(array_filter($this->getTableStructure()->getColumns(), fn($column) => !in_array($column->getName(), $keys)) as $column){
+            foreach(array_filter($this->getTableStructure()->getColumns(), fn($column) => !in_array($column->getName(), $keys) && !$column->isAutoIncrement()) as $column){
                 $insert_keys[] = $this->escapeColumnName($column->getName());
-                $value_key = ':i_' . $i;
 
                 $default = $column->generateDefault();
                 if($default === null){
                     $insert_values[] = 'null';
                 }else{
+                    $value_key = ':i_' . $i;
                     $bindings[$value_key] = $default;
                     $insert_values[] = $column->transformInsertValueKey($value_key);
                 }

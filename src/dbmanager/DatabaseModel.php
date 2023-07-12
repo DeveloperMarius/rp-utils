@@ -21,6 +21,7 @@ use utils\dbmanager\attributes\PlaintextProperty;
 use utils\dbmanager\attributes\PrimaryKeyProperty;
 use utils\dbmanager\attributes\ReadonlyProperty;
 use utils\dbmanager\attributes\UUIDv4Property;
+use utils\dbmanager\types\DBTypeBoolean;
 use utils\dbmanager\types\DBTypeFloat;
 use utils\dbmanager\types\DBTypeInt;
 use utils\dbmanager\types\DBTypeString;
@@ -781,7 +782,7 @@ abstract class DatabaseModel implements JsonSerializable{
             $type = match($real_type['type']){
                 'string' => new DBTypeString(),
                 'int' => new DBTypeInt(),
-                'bool' => new DBTypeTinyInt(),
+                'bool' => new DBTypeBoolean(),
                 'float' => new DBTypeFloat(),
                 default => null
             };
@@ -792,8 +793,25 @@ abstract class DatabaseModel implements JsonSerializable{
             $attributes = $property->getAttributes();
             foreach($attributes as $attribute){
                 switch($attribute->getName()){
-                    case ForeignKeyProperty::class:
+                    case PrimaryKeyProperty::class:
+                        $column->setPrimaryKey(true);
                         break;
+                    case ForeignKeyProperty::class:
+                        /**
+                         * @var $foreign_key_property ForeignKeyProperty
+                         */
+                        $foreign_key_property = $attribute->newInstance();
+                        $column->setForeignKey(true, $foreign_key_property->getReferencesColumn(), $foreign_key_property->getReferencesTable(), $foreign_key_property->getOnDelete(), $foreign_key_property->getOnUpdate());
+                        break;
+                    case ReadonlyProperty::class:
+                        //Throw error on before insert
+                        break;
+                }
+            }
+            if($column->isPrimaryKey() && !$column->hasForeignKey())
+                $column->setAutoIncrement(true);
+            foreach($attributes as $attribute){
+                switch($attribute->getName()){
                     case UUIDv4Property::class:
                         $uuid_property = $attribute->newInstance();
                         if($uuid_property->isBinary()){
@@ -802,9 +820,6 @@ abstract class DatabaseModel implements JsonSerializable{
                         }
                         //if(sizeof(array_filter($attributes, fn($attribute) => $attribute->getName() === PrimaryKeyProperty::class)) > 0)
                         //    $column->setDefaultGenerator(fn() => Util::generateUuid());
-                        break;
-                    case ReadonlyProperty::class:
-                        //Throw error on before insert
                         break;
                 }
             }

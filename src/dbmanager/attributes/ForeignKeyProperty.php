@@ -3,6 +3,7 @@
 namespace utils\dbmanager\attributes;
 
 use Attribute;
+use JetBrains\PhpStorm\ExpectedValues;
 
 /**
  *
@@ -13,22 +14,38 @@ class ForeignKeyProperty
 {
 
     /**
-     * @param string|null $references
-     * @param bool $cascade_on_delete
+     * @param string|null $references_column
+     * @param string|null $references_table
+     * @param string|null $on_delete
+     * @param string|null $on_update
      */
-    public function __construct(private readonly ?string $references = null, private readonly bool $cascade_on_delete = true){}
+    public function __construct(private readonly ?string $references_column = null, private readonly ?string $references_table = null, #[ExpectedValues([null, 'CASCADE'])] private readonly ?string $on_delete = null, private readonly ?string $on_update = null){}
 
     /**
      * @return string|null
      */
-    public function getReferences(): ?string{
-        return $this->references;
+    public function getReferencesColumn(): ?string{
+        return $this->references_column;
     }
 
     /**
-     * @return bool
+     * @return string|null
      */
-    public function isCascadeOnDelete(): bool{
-        return $this->cascade_on_delete;
+    public function getReferencesTable(): ?string{
+        return $this->references_table;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOnDelete(): ?string{
+        return $this->on_delete;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOnUpdate(): ?string{
+        return $this->on_update;
     }
 }
