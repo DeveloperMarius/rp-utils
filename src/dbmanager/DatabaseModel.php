@@ -521,6 +521,8 @@ abstract class DatabaseModel implements JsonSerializable{
             $vars['__type__'] = self::getModelName();
             if(isset($vars['password']))
                 $vars['password'] = '<**Protected Property**>';
+            if(isset($vars['password_salt']))
+                $vars['password_salt'] = '<**Protected Property**>';
         }
         return $vars;
     }
