@@ -420,8 +420,8 @@ abstract class DatabaseModel implements JsonSerializable{
         self::validate($data, true);
         if(!self::hasId())
             throw new ModelException('createWithIdCallback only works for models with ids');
-        $callback = self::getDBManager()->insert($data)->getLastInsertRow();
-        return new static($callback);//static::getById($id['id']);
+        $callback = self::getDBManager()->setReturning('id')->insert($data)->getReturningValue();
+        return static::getById($callback);//new static($callback);
     }
 
     /**

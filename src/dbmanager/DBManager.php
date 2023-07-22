@@ -108,6 +108,14 @@ class DBManager{
      * @var string|null $model_namespace
      */
     private ?string $model_namespace = null;
+    /**
+     * @var string|null $returning
+     */
+    private ?string $returning = null;
+    /**
+     * @var mixed|null $returning_value
+     */
+    private mixed $returning_value = null;
 
     const
         CALLBACK_ID = 1,
@@ -288,6 +296,8 @@ class DBManager{
         $this->where = null;
         $this->execute_status = null;
         $this->table_structure = null;
+        $this->returning = null;
+        $this->returning_value = null;
         return $this;
     }
 
@@ -580,9 +590,32 @@ class DBManager{
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
+    public function getReturning(): ?string{
+        return $this->returning;
+    }
+
+    /**
+     * @param string $returning
+     * @return self
+     */
+    public function setReturning(string $returning): self{
+        $this->returning = $returning;
+        return $this;
+    }
+
     private function provideModel(string $className): self{
         $this->model = $className;
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getReturningValue(): mixed{
+        return $this->returning_value;
     }
 
     private function escapeColumnName(string $columnName): string{
@@ -971,6 +1004,9 @@ class DBManager{
         $error = null;
         $error_code = null;
         try{
+            if($this->getReturning() !== null){
+                $query .= ' RETURNING ' . $this->escapeColumnName($this->getReturning());
+            }
             $statement = $this->getDbconn()->prepare($query);
         }catch(PDOException $e){
             $error = $e->getMessage();
@@ -996,6 +1032,12 @@ class DBManager{
                 $this->setExecuteStatus($this->getStatement()->execute());
                 if(!$this->getExecuteStatus()){
                     throw new SQLException($this->getErrorMessage(), code: $this->getErrorCode(), info: $this->getErrorInfo());
+                }
+                if($this->getReturning() !== null && $this->getStatement()->rowCount() > 0){
+                    $callback = $this->getStatement()->fetch();
+                    $this->setExecuteStatus($callback !== false);
+                    if($callback)
+                        $this->returning_value = $callback[$this->getReturning()];
                 }
                 return $this;
             }catch(PDOException $e){
