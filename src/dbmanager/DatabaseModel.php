@@ -171,6 +171,10 @@ abstract class DatabaseModel implements JsonSerializable{
                 }
             }catch(ReflectionException $e){}
             $this->$key = $value;
+            $obj_key = $key . '_object';
+            if(isset($this->$obj_key)){
+                unset($this->$obj_key);
+            }
         }
     }
 
@@ -505,6 +509,14 @@ abstract class DatabaseModel implements JsonSerializable{
      */
     public function toArray(bool $cleanData = false): array{
         $vars = get_object_vars($this);
+        foreach($vars as $key => $value){
+            $property = new ReflectionProperty($this, $key);
+            if(static::$htmlSpecialChars && is_string($value)){
+                $attributes = $property->getAttributes(PlaintextProperty::class);
+                if(sizeof($attributes) === 0)
+                    $vars[$key] = htmlspecialchars_decode($value);
+            }
+        }
         if(!$cleanData){
             $vars['__type__'] = self::getModelName();
             if(isset($vars['password']))
