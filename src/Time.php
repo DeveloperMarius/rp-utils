@@ -146,6 +146,16 @@ class Time extends DateTime implements \JsonSerializable{
      * @param Time|int|null $from
      * @return bool
      */
+    public function isInPastOrNow(Time|int|null $from = null): bool{
+        if($from instanceof Time)
+            $from = $from->getTimestamp();
+        return $this->getTimestamp() <= ($from !== null ? $from : Util::getTimestamp(false));
+    }
+
+    /**
+     * @param Time|int|null $from
+     * @return bool
+     */
     public function isInFuture(Time|int|null $from = null): bool{
         if($from instanceof Time)
             $from = $from->getTimestamp();
