@@ -60,7 +60,7 @@ class Time extends DateTime implements \JsonSerializable{
      * @return false|static
      */
     public static function createFromTimestamp(int $timestamp, bool $milliseconds = true): static|false{
-        return static::createFromFormat( 'U', $milliseconds ? intval($timestamp/1000) : $timestamp);
+        return (new static())->setTimestamp($milliseconds ? intval($timestamp/1000) : $timestamp);
     }
 
     /**
