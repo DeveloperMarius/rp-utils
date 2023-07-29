@@ -6,6 +6,7 @@ use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\Pure;
 use PHPMailer\PHPMailer\PHPMailer;
 
+#[Deprecated]
 class mail_config{
 
     /**
