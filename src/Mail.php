@@ -24,7 +24,7 @@ class Mail{
      */
     public static function sendMail(string $subject, string $body, string $from, array|string $recipients, array $attachments = array(), ?MailConfig $mail_config = null, bool $temp = false): bool{
         try{
-
+            $from = str_replace(['&amp;', '&quot;', '&#039;', '&apos;'], ['&', '"', '\'', '\''], $from);
             $mail = self::getMailer($from, $mail_config, $temp);
             $mail->Subject = $subject;
             $mail->Body = $body;
