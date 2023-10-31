@@ -268,9 +268,10 @@ class Util{
     /**
      * @param string $input
      * @param string $divider
+     * @param bool $includeNumbersAsDivider
      * @return string
      */
-    public static function replaceToCamelCase(string $input, string $divider = '_'): string{
+    public static function replaceToCamelCase(string $input, string $divider = '_', bool $includeNumbersAsDivider = true): string{
         $input = str_replace($divider . 'a', 'A', $input);
         $input = str_replace($divider . 'b', 'B', $input);
         $input = str_replace($divider . 'c', 'C', $input);
@@ -297,25 +298,28 @@ class Util{
         $input = str_replace($divider . 'x', 'X', $input);
         $input = str_replace($divider . 'y', 'Y', $input);
         $input = str_replace($divider . 'z', 'Z', $input);
-        $input = str_replace($divider . '0', '0', $input);
-        $input = str_replace($divider . '1', '1', $input);
-        $input = str_replace($divider . '2', '2', $input);
-        $input = str_replace($divider . '3', '3', $input);
-        $input = str_replace($divider . '4', '4', $input);
-        $input = str_replace($divider . '5', '5', $input);
-        $input = str_replace($divider . '6', '6', $input);
-        $input = str_replace($divider . '7', '7', $input);
-        $input = str_replace($divider . '8', '8', $input);
-        $input = str_replace($divider . '9', '9', $input);
+        if($includeNumbersAsDivider) {
+            $input = str_replace($divider . '0', '0', $input);
+            $input = str_replace($divider . '1', '1', $input);
+            $input = str_replace($divider . '2', '2', $input);
+            $input = str_replace($divider . '3', '3', $input);
+            $input = str_replace($divider . '4', '4', $input);
+            $input = str_replace($divider . '5', '5', $input);
+            $input = str_replace($divider . '6', '6', $input);
+            $input = str_replace($divider . '7', '7', $input);
+            $input = str_replace($divider . '8', '8', $input);
+            $input = str_replace($divider . '9', '9', $input);
+        }
         return $input;
     }
 
     /**
      * @param string $input
      * @param string $divider
+     * @param bool $includeNumbersAsDivider
      * @return string
      */
-    public static function replaceFromCamelCase(string $input, string $divider = '_'): string{
+    public static function replaceFromCamelCase(string $input, string $divider = '_', bool $includeNumbersAsDivider = true): string{
         $input = str_replace('A', $divider . 'a', $input);
         $input = str_replace('B', $divider . 'b', $input);
         $input = str_replace('C', $divider . 'c', $input);
@@ -342,16 +346,18 @@ class Util{
         $input = str_replace('X', $divider . 'x', $input);
         $input = str_replace('Y', $divider . 'y', $input);
         $input = str_replace('Z', $divider . 'z', $input);
-        $input = str_replace('0', $divider . '0', $input);
-        $input = str_replace('1', $divider . '1', $input);
-        $input = str_replace('2', $divider . '2', $input);
-        $input = str_replace('3', $divider . '3', $input);
-        $input = str_replace('4', $divider . '4', $input);
-        $input = str_replace('5', $divider . '5', $input);
-        $input = str_replace('6', $divider . '6', $input);
-        $input = str_replace('7', $divider . '7', $input);
-        $input = str_replace('8', $divider . '8', $input);
-        $input = str_replace('9', $divider . '9', $input);
+        if($includeNumbersAsDivider) {
+            $input = str_replace('0', $divider . '0', $input);
+            $input = str_replace('1', $divider . '1', $input);
+            $input = str_replace('2', $divider . '2', $input);
+            $input = str_replace('3', $divider . '3', $input);
+            $input = str_replace('4', $divider . '4', $input);
+            $input = str_replace('5', $divider . '5', $input);
+            $input = str_replace('6', $divider . '6', $input);
+            $input = str_replace('7', $divider . '7', $input);
+            $input = str_replace('8', $divider . '8', $input);
+            $input = str_replace('9', $divider . '9', $input);
+        }
         return $input;
     }
 

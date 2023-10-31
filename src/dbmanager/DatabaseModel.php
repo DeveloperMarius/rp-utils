@@ -572,7 +572,8 @@ abstract class DatabaseModel implements JsonSerializable{
                 }
                 return $this->$val_object_name;
             }else{
-                return $this->$val_name;
+                $val_name2 = Util::replaceFromCamelCase(lcfirst(str_replace('get', '', $name)), includeNumbersAsDivider: false);
+                return $this->$val_name ?? $this->$val_name2;
             }
         }else if(str_starts_with($name, 'is')){
             $name = Util::replaceFromCamelCase(lcfirst(str_replace('is', '', $name)));
