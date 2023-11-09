@@ -378,6 +378,19 @@ class Time extends DateTime implements \JsonSerializable{
     }
 
     /**
+     * @param int $months
+     * @return Time
+     */
+    public function addMonths(int $months): self{
+        if($months < 0){
+            $this->sub(new DateInterval('P' . ($months * -1) . 'M'));
+        }else{
+            $this->add(new DateInterval('P' . $months . 'M'));
+        }
+        return $this;
+    }
+
+    /**
      * @param bool $short
      * @return string
      */
@@ -397,6 +410,19 @@ class Time extends DateTime implements \JsonSerializable{
      */
     public function getYear(): int{
         return intval($this->format('Y'));
+    }
+
+    /**
+     * @param int $years
+     * @return Time
+     */
+    public function addYears(int $years): self{
+        if($years < 0){
+            $this->sub(new DateInterval('P' . ($years * -1) . 'Y'));
+        }else{
+            $this->add(new DateInterval('P' . $years . 'Y'));
+        }
+        return $this;
     }
 
     /**
