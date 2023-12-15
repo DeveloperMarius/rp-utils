@@ -343,7 +343,7 @@ abstract class DatabaseModel implements JsonSerializable{
                                 if($type_class->getBackingType() instanceof \ReflectionNamedType)
                                     $routeAttribute->setType($type_class->getBackingType()->getName());
                                 else
-                                    $routeAttribute->setType('int');
+                                    $routeAttribute->setType('string');
                             }else if(is_subclass_of($property_type_name, DatabaseModel::class)){
                                 $classlist = explode('\\', $property->getType()->getName());
                                 if(!in_array('model:' . $property->getType()->getName(), $routeAttribute->getFullValidator())
@@ -572,7 +572,8 @@ abstract class DatabaseModel implements JsonSerializable{
                 }
                 return $this->$val_object_name;
             }else{
-                return $this->$val_name;
+                $val_name2 = Util::replaceFromCamelCase(lcfirst(str_replace('get', '', $name)), includeNumbersAsDivider: false);
+                return $this->$val_name ?? $this->$val_name2;
             }
         }else if(str_starts_with($name, 'is')){
             $name = Util::replaceFromCamelCase(lcfirst(str_replace('is', '', $name)));
