@@ -277,7 +277,7 @@ abstract class DatabaseModel implements JsonSerializable{
                         if($backing_type instanceof \ReflectionNamedType)
                             $type = $backing_type->getName();
                         else
-                            $type = 'int';
+                            $type = 'string';
                     }else{
                         $type = 'int';
                     }

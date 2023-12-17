@@ -11,7 +11,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_METHOD|Attribute::IS_REPEATABLE)]
 class APIResponse {
 
-    public function __construct(private readonly int $code, private readonly ?array $schema = null, private readonly ?string $description = null, private readonly string $content_type = 'application/json'){}
+    public function __construct(private readonly int $code, private readonly ?array $schema = null, private readonly ?string $description = null, private readonly string $content_type = 'application/json', private readonly ?string $generator = null){}
 
     public function getCode(): int{
         return $this->code;
@@ -32,4 +32,10 @@ class APIResponse {
         return $this->content_type;
     }
 
+    public function generateSchema(): array{
+        $generator = $this->generator;
+        if($generator === null)
+            return $this->getSchema();
+        return $generator($this->getSchema());
+    }
 }
