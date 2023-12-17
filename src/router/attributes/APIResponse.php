@@ -12,7 +12,7 @@ use Closure;
 #[Attribute(Attribute::TARGET_METHOD|Attribute::IS_REPEATABLE)]
 class APIResponse {
 
-    public function __construct(private readonly int $code, private readonly ?array $schema = null, private readonly ?string $description = null, private readonly string $content_type = 'application/json', private readonly ?Closure $generator = null){}
+    public function __construct(private readonly int $code, private readonly ?array $schema = null, private readonly ?string $description = null, private readonly string $content_type = 'application/json', private readonly ?string $generator = null){}
 
     public function getCode(): int{
         return $this->code;
