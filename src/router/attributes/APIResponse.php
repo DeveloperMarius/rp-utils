@@ -2,7 +2,6 @@
 
 namespace utils\router\attributes;
 use Attribute;
-use Closure;
 
 /**
  *
@@ -33,14 +32,14 @@ class APIResponse {
         return $this->content_type;
     }
 
-    public function generateSchema(): array{
+    public function generateSchema(): ?array{
         $generator = $this->generator;
         if($generator === null)
             return $this->getSchema();
         return $generator($this->getSchema());
     }
 
-    const successResponseGenerator = 'utils\\router\\utils\\RouterUtils::successResponseGenerator';
+    const successResponseGenerator = 'utils\\router\\attributes\\APIResponse::successResponseGenerator';
 
     public static function successResponseGenerator(mixed $data): array{
         return array(
@@ -51,7 +50,7 @@ class APIResponse {
         );
     }
 
-    const errorResponseGenerator = 'utils\\router\\utils\\RouterUtils::errorResponseGenerator';
+    const errorResponseGenerator = 'utils\\router\\attributes\\APIResponse::errorResponseGenerator';
 
     public static function errorResponseGenerator(mixed $data): array{
         return array(
@@ -64,7 +63,7 @@ class APIResponse {
         );
     }
 
-    const successPaginationResponseGenerator = 'utils\\router\\utils\\RouterUtils::successPaginationResponseGenerator';
+    const successPaginationResponseGenerator = 'utils\\router\\attributes\\APIResponse::successPaginationResponseGenerator';
 
     public static function successPaginationResponseGenerator(mixed $data): array{
         return array(
