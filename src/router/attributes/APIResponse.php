@@ -2,6 +2,7 @@
 
 namespace utils\router\attributes;
 use Attribute;
+use Closure;
 
 /**
  *
@@ -11,7 +12,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_METHOD|Attribute::IS_REPEATABLE)]
 class APIResponse {
 
-    public function __construct(private readonly int $code, private readonly ?array $schema = null, private readonly ?string $description = null, private readonly string $content_type = 'application/json', private readonly ?string $generator = null){}
+    public function __construct(private readonly int $code, private readonly ?array $schema = null, private readonly ?string $description = null, private readonly string $content_type = 'application/json', private readonly ?Closure $generator = null){}
 
     public function getCode(): int{
         return $this->code;
@@ -39,7 +40,7 @@ class APIResponse {
         return $generator($this->getSchema());
     }
 
-    public static string $successResponseGenerator = 'utils\\router\\utils\\RouterUtils::successResponseGenerator';
+    const successResponseGenerator = 'utils\\router\\utils\\RouterUtils::successResponseGenerator';
 
     public static function successResponseGenerator(mixed $data): array{
         return array(
@@ -50,7 +51,7 @@ class APIResponse {
         );
     }
 
-    public static string $errorResponseGenerator = 'utils\\router\\utils\\RouterUtils::errorResponseGenerator';
+    const errorResponseGenerator = 'utils\\router\\utils\\RouterUtils::errorResponseGenerator';
 
     public static function errorResponseGenerator(mixed $data): array{
         return array(
@@ -63,7 +64,7 @@ class APIResponse {
         );
     }
 
-    public static string $successPaginationResponseGenerator = 'utils\\router\\utils\\RouterUtils::successPaginationResponseGenerator';
+    const successPaginationResponseGenerator = 'utils\\router\\utils\\RouterUtils::successPaginationResponseGenerator';
 
     public static function successPaginationResponseGenerator(mixed $data): array{
         return array(
