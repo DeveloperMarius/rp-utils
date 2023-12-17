@@ -11,50 +11,6 @@ use Pecee\SimpleRouter\SimpleRouter as Router;
 
 trait RouterUtils{
 
-    public static string $successResponseGenerator = 'utils\\router\\utils\\RouterUtils::successResponseGenerator';
-
-    public static function successResponseGenerator(mixed $data): array{
-        return array(
-            'success' => 'bool',
-            'message' => 'string',
-            'data' => $data,
-            'meta' => array()
-        );
-    }
-
-    public static string $errorResponseGenerator = 'utils\\router\\utils\\RouterUtils::errorResponseGenerator';
-
-    public static function errorResponseGenerator(mixed $data): array{
-        return array(
-            'success' => 'bool',
-            'message' => 'string',
-            'info' => 'string',
-            'errors' => array(),
-            'code' => 'integer',
-            'data' => $data
-        );
-    }
-
-    public static string $successPaginationResponseGenerator = 'utils\\router\\utils\\RouterUtils::successPaginationResponseGenerator';
-
-    public static function successPaginationResponseGenerator(mixed $data): array{
-        return array(
-            'success' => 'bool',
-            'message' => 'string',
-            'info' => 'string',
-            'errors' => array(),
-            'code' => 'integer',
-            'data' => $data,
-            'meta' => array(
-                'current_page' => 'integer',
-                'first_page' => 'integer',
-                'last_page' => 'integer',
-                'total_results' => 'integer',
-                'page_size' => 'integer'
-            )
-        );
-    }
-
     /**
      * @param array $data
      * @param string|null $message
