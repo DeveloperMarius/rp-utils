@@ -30,7 +30,9 @@ class EnvLoader{
             $env_values = array();
             foreach($content_array as $line){
                 $split = array_map('trim', explode('=', $line, 2));
-                $env_values[$split[0]] = $split[1] ?? '';
+                if($split[1] === '')
+                    $split[1] = null;
+                $env_values[$split[0]] = $split[1];
             }
             array_map('\utils\EnvLoader::set', array_keys($env_values), array_values($env_values));
         }
