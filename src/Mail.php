@@ -41,7 +41,7 @@ class Mail{
 
             foreach($attachments as $attachment){
                 if(is_array($attachment)){
-                    $mail->addStringAttachment($attachment['data'], $attachment['name'], $attachment['encoding'] ?? '', $attachment['type'] ?? '', $attachment['disposition'] ?? 'attachment');
+                    $mail->addStringAttachment($attachment['data'], $attachment['name'], $attachment['encoding'] ?? PHPMailer::ENCODING_BASE64, $attachment['type'] ?? '', $attachment['disposition'] ?? 'attachment');
                 }else{
                     $mail->addAttachment($attachment);
                 }
