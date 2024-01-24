@@ -22,7 +22,7 @@ class Mail{
      * @param bool $temp
      * @return bool
      */
-    public static function sendMail(string $subject, string $body, string $from, array|string $recipients, array $attachments = array(), ?MailConfig $mail_config = null, bool $temp = false): bool{
+    public static function sendMail(string $subject, string $body, string $from, array|string $recipients, array $attachments = array(), array|string $reply_to = array(), ?MailConfig $mail_config = null, bool $temp = false): bool{
         try{
             $from = str_replace(['&amp;', '&quot;', '&#039;', '&apos;'], ['&', '"', '\'', '\''], $from);
             $mail = self::getMailer($from, $mail_config, $temp);
@@ -30,6 +30,14 @@ class Mail{
             $mail->Body = $body;
             $mail->AltBody = strip_tags($body);
             $mail->isHTML(true);
+
+            if(is_array($reply_to)){
+                foreach($reply_to as $reply_to_user){
+                    $mail->addReplyTo($reply_to_user);
+                }
+            }else if(is_string($reply_to)){
+                $mail->addReplyTo($reply_to);
+            }
 
             if(is_array($recipients)){
                 foreach($recipients as $recipient){
