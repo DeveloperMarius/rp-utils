@@ -71,9 +71,9 @@ class EnvLoader{
 
     /**
      * @param string $key
-     * @param string $value
+     * @param string | null $value
      */
-    public static function set(string $key, string $value){
+    public static function set(string $key, string | null $value){
         $_ENV[$key] = $value;
     }
 
