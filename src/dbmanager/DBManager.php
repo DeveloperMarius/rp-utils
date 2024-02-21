@@ -869,8 +869,11 @@ class DBManager{
                     $insert_values[] = 'null';
                 }else{
                     $value_key = ':i_' . $i;
-                    $bindings[$value_key] = $default;
-                    $insert_values[] = $column->transformInsertValueKey($value_key);
+                    $insert_value = $column->transformInsertValueKey($value_key);
+                    $insert_values[] = $insert_value;
+                    if(str_contains($insert_value, $value_key)){
+                        $bindings[$value_key] = $default;
+                    }
                 }
 
                 $i++;

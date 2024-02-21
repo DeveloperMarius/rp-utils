@@ -16,6 +16,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
 use UnitEnum;
+use utils\dbmanager\attributes\EntityTag;
 use utils\dbmanager\attributes\ForeignKeyProperty;
 use utils\dbmanager\attributes\PlaintextProperty;
 use utils\dbmanager\attributes\PrimaryKeyProperty;
@@ -835,6 +836,9 @@ abstract class DatabaseModel implements JsonSerializable{
                         }
                         //if(sizeof(array_filter($attributes, fn($attribute) => $attribute->getName() === PrimaryKeyProperty::class)) > 0)
                         //    $column->setDefaultGenerator(fn() => Util::generateUuid());
+                        break;
+                    case EntityTag::class:
+                        $column->applyBeforeInsert(DBFunction::GENERATE_UUID);
                         break;
                 }
             }
