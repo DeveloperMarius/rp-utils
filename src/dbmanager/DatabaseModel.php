@@ -838,7 +838,8 @@ abstract class DatabaseModel implements JsonSerializable{
                         //    $column->setDefaultGenerator(fn() => Util::generateUuid());
                         break;
                     case EntityTag::class:
-                        $column->applyBeforeInsert(DBFunction::GENERATE_UUID);
+                        //$column->applyBeforeInsert(DBFunction::GENERATE_UUID);
+                        $column->setDefaultGenerator(fn() => Util::generateUuid());
                         break;
                 }
             }
