@@ -54,6 +54,13 @@ class DBColumn{
     }
 
     /**
+     * @param DBType $type
+     */
+    public function setType(DBType $type): void{
+        $this->type = $type;
+    }
+
+    /**
      * @return bool
      */
     public function isAutoIncrement(): bool{

@@ -27,6 +27,7 @@ use utils\dbmanager\types\DBTypeFloat;
 use utils\dbmanager\types\DBTypeInt;
 use utils\dbmanager\types\DBTypeString;
 use utils\dbmanager\types\DBTypeTinyInt;
+use utils\dbmanager\types\DBTypeUUID;
 use utils\exception\ModelException;
 use utils\exception\SQLException;
 use utils\Inflector;
@@ -318,6 +319,7 @@ abstract class DatabaseModel implements JsonSerializable{
         $properties = array();
         foreach(self::getProperties() as $property){
             $readonlyAttributes = $property->getAttributes(ReadonlyProperty::class);
+            $uuidAttributes = $property->getAttributes(UUIDv4Property::class);
             $propertyAttributes = $property->getAttributes(ValidatorAttribute::class);
 
             /* @var ValidatorAttribute|null $routeAttribute */
@@ -330,6 +332,9 @@ abstract class DatabaseModel implements JsonSerializable{
                 $routeAttribute = $propertyAttributes[0]->newInstance();
                 if($routeAttribute->getName() === null)
                     $routeAttribute->setName($property->getName());
+                if(sizeof($uuidAttributes) > 0){
+                    $routeAttribute->addValidator('uuid');
+                }
                 if($routeAttribute->getType() === null && $property->getType() !== null){
                     if(!$property->getType()->isBuiltin()){
                         $property_type_name = $property->getType()->getName();
@@ -469,6 +474,7 @@ abstract class DatabaseModel implements JsonSerializable{
      */
     public function update(array $set, array $where = null): bool{
         self::validate($set);
+        self::validate($where, true);
         self::getDBManager()->where($where === null ? array('id' => $this->getId()) : $where)->update($set);
         $this->setProperties($set);
         return true;
@@ -483,6 +489,7 @@ abstract class DatabaseModel implements JsonSerializable{
      */
     public static function update_(array $set, array $where): bool{
         self::validate($set);
+        self::validate($where, true);
         self::getDBManager()->where($where)->update($set);
         return true;
     }
@@ -498,6 +505,7 @@ abstract class DatabaseModel implements JsonSerializable{
      */
     public function set(string $key, mixed $value, array $where = null): bool{
         self::validate(array($key => $value));
+        self::validate($where, true);
         self::getDBManager()->where($where === null ? array('id' => $this->getId()) : $where)->update(array($key => $value));
         $this->setProperties(array(
             $key => $value
@@ -594,9 +602,11 @@ abstract class DatabaseModel implements JsonSerializable{
     /**
      * @param array|null $where
      * @return bool
+     * @throws InputValidationException
      * @throws SQLException
      */
     public function delete(?array $where = null): bool{
+        self::validate($where, true);
         self::getDBManager()->where($where === null ? array('id' => $this->getId()) : $where)->delete();
         return true;
     }
@@ -633,12 +643,12 @@ abstract class DatabaseModel implements JsonSerializable{
      * @param array $data
      * @param array $validators
      * @param array $filter_data
-     * @param bool $create
+     * @param bool $ignore_readonly
      * @return void
      */
-    private static function validateProperty(string $property_name, array $data, array &$validators, array &$filter_data, bool $create = false){
+    private static function validateProperty(string $property_name, array $data, array &$validators, array &$filter_data, bool $ignore_readonly = false){
         if(isset(self::getPropertyCache()[$property_name])){
-            if($create || self::getPropertyCache()[$property_name]->readonly){
+            if($ignore_readonly || self::getPropertyCache()[$property_name]->readonly){
                 $validators[$property_name] = self::getPropertyCache()[$property_name]->validator->getFullValidator();
                 $filter_data[$property_name] = self::toValidatorValue($data[$property_name]);
             }
@@ -672,13 +682,13 @@ abstract class DatabaseModel implements JsonSerializable{
      * @return bool
      * @throws InputValidationException
      */
-    public static function validate(array $data, bool $create = false): bool{
+    public static function validate(array $data, bool $ignore_readonly = false): bool{
         $validators = array();
         $filter_data = array();
         if(self::hasDynamicProperties()){
             foreach($data as $key => $value){
                 if(array_key_exists($key, self::getPropertyCache())){
-                    self::validateProperty($key, $data, $validators, $filter_data, $create);
+                    self::validateProperty($key, $data, $validators, $filter_data, $ignore_readonly);
                 }else{
                     $filter_data[$key] = self::toValidatorValue($value);
                 }
@@ -686,7 +696,7 @@ abstract class DatabaseModel implements JsonSerializable{
         }else {
             foreach(array_keys(self::getPropertyCache()) as $property_name){
                 if(array_key_exists($property_name, $data)){
-                    self::validateProperty($property_name, $data, $validators, $filter_data, $create);
+                    self::validateProperty($property_name, $data, $validators, $filter_data, $ignore_readonly);
                 }
             }
         }
@@ -704,8 +714,12 @@ abstract class DatabaseModel implements JsonSerializable{
      * @return T
      * @throws ModelException
      * @throws SQLException
+     * @throws InputValidationException
      */
     public static function getById(int|string $id): object{
+        self::validate(array(
+            'id' => $id
+        ));
         return self::getDBManager()->where(array('id' => $id))->fetchObject(self::getObjectClass());
     }
 
@@ -714,8 +728,10 @@ abstract class DatabaseModel implements JsonSerializable{
      * @return T
      * @throws ModelException
      * @throws SQLException
+     * @throws InputValidationException
      */
     public static function get(array $where): object{
+        self::validate($where, true);
         return self::getDBManager()->where($where)->fetchObject(self::getObjectClass());
     }
 
@@ -723,8 +739,10 @@ abstract class DatabaseModel implements JsonSerializable{
      * @param array $where
      * @return array
      * @throws SQLException
+     * @throws InputValidationException
      */
     public static function getAllPlain(array $where = array()): array{
+        self::validate($where, true);
         return self::getDBManager()->where($where)->fetchAll();
     }
 
@@ -737,8 +755,10 @@ abstract class DatabaseModel implements JsonSerializable{
      * @return T[]
      * @throws ModelException
      * @throws SQLException
+     * @throws InputValidationException
      */
     public static function getAll(array $where = array(), ?int $limit = null, bool $order_desc = false, string|int|null $order_by = null, ?int $offset = null): array{
+        self::validate($where, true);
         $request = self::getDBManager()->where($where)->setLimit($limit, $offset);
         if($order_desc)
             $request->setOrderDESC();
@@ -751,8 +771,10 @@ abstract class DatabaseModel implements JsonSerializable{
      * @param array $where
      * @return bool
      * @throws SQLException
+     * @throws InputValidationException
      */
     public static function exists(array $where = array()): bool{
+        self::validate($where, true);
         return self::getDBManager()->where($where)->exist();
     }
 
@@ -760,8 +782,10 @@ abstract class DatabaseModel implements JsonSerializable{
      * @param array $where
      * @return bool
      * @throws SQLException
+     * @throws InputValidationException
      */
     public static function delete_(array $where = array()): bool{
+        self::validate($where, true);
         self::getDBManager()->where($where)->delete();
         return true;
     }
@@ -811,6 +835,12 @@ abstract class DatabaseModel implements JsonSerializable{
                 switch($attribute->getName()){
                     case PrimaryKeyProperty::class:
                         $column->setPrimaryKey(true);
+                        break;
+                    case UUIDv4Property::class:
+                        $type = new DBTypeUUID();
+                        if($real_type['nullable'])
+                            $type->setDbTypeDefaultNull();
+                        $column->setType($type);
                         break;
                     case ForeignKeyProperty::class:
                         /**
