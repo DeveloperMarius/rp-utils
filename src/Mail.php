@@ -71,6 +71,8 @@ class Mail{
         if (static::$_mailer === null || $temp) {
             if($mail_config === null)
                 $mail_config = MailConfig::$default;
+            if($mail_config === null)
+                throw new Exception('No MailConfig found');
             $mailer = new PHPMailer(true);
 
             $mailer->isSMTP();
