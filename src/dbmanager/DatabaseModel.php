@@ -719,7 +719,7 @@ abstract class DatabaseModel implements JsonSerializable{
     public static function getById(int|string $id): object{
         self::validate(array(
             'id' => $id
-        ));
+        ), true);
         return self::getDBManager()->where(array('id' => $id))->fetchObject(self::getObjectClass());
     }
 
