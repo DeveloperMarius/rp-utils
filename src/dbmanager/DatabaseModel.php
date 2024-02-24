@@ -474,7 +474,7 @@ abstract class DatabaseModel implements JsonSerializable{
      */
     public function update(array $set, array $where = null): bool{
         self::validate($set);
-        self::validate($where, true);
+        self::validate($where, true, true);
         self::getDBManager()->where($where === null ? array('id' => $this->getId()) : $where)->update($set);
         $this->setProperties($set);
         return true;
@@ -489,7 +489,7 @@ abstract class DatabaseModel implements JsonSerializable{
      */
     public static function update_(array $set, array $where): bool{
         self::validate($set);
-        self::validate($where, true);
+        self::validate($where, true, true);
         self::getDBManager()->where($where)->update($set);
         return true;
     }
@@ -505,7 +505,7 @@ abstract class DatabaseModel implements JsonSerializable{
      */
     public function set(string $key, mixed $value, array $where = null): bool{
         self::validate(array($key => $value));
-        self::validate($where, true);
+        self::validate($where, true, true);
         self::getDBManager()->where($where === null ? array('id' => $this->getId()) : $where)->update(array($key => $value));
         $this->setProperties(array(
             $key => $value
@@ -606,7 +606,7 @@ abstract class DatabaseModel implements JsonSerializable{
      * @throws SQLException
      */
     public function delete(?array $where = null): bool{
-        self::validate($where, true);
+        self::validate($where, true, true);
         self::getDBManager()->where($where === null ? array('id' => $this->getId()) : $where)->delete();
         return true;
     }
@@ -678,11 +678,12 @@ abstract class DatabaseModel implements JsonSerializable{
 
     /**
      * @param array $data
-     * @param bool $create
+     * @param bool $ignore_readonly
+     * @param bool $ignore_empty
      * @return bool
      * @throws InputValidationException
      */
-    public static function validate(array $data, bool $ignore_readonly = false): bool{
+    public static function validate(array $data, bool $ignore_readonly = false, bool $ignore_empty = false): bool{
         $validators = array();
         $filter_data = array();
         if(self::hasDynamicProperties()){
@@ -700,7 +701,7 @@ abstract class DatabaseModel implements JsonSerializable{
                 }
             }
         }
-        if(sizeof($filter_data) === 0)
+        if(!$ignore_empty && sizeof($filter_data) === 0)
             throw new InputValidationException('Nothing to update');
         //if(sizeof($data) > $validators)
         //    throw new InputValidationException('Input value present without validator rule');
@@ -731,7 +732,7 @@ abstract class DatabaseModel implements JsonSerializable{
      * @throws InputValidationException
      */
     public static function get(array $where): object{
-        self::validate($where, true);
+        self::validate($where, true, true);
         return self::getDBManager()->where($where)->fetchObject(self::getObjectClass());
     }
 
@@ -742,7 +743,7 @@ abstract class DatabaseModel implements JsonSerializable{
      * @throws InputValidationException
      */
     public static function getAllPlain(array $where = array()): array{
-        self::validate($where, true);
+        self::validate($where, true, true);
         return self::getDBManager()->where($where)->fetchAll();
     }
 
@@ -758,7 +759,7 @@ abstract class DatabaseModel implements JsonSerializable{
      * @throws InputValidationException
      */
     public static function getAll(array $where = array(), ?int $limit = null, bool $order_desc = false, string|int|null $order_by = null, ?int $offset = null): array{
-        self::validate($where, true);
+        self::validate($where, true, true);
         $request = self::getDBManager()->where($where)->setLimit($limit, $offset);
         if($order_desc)
             $request->setOrderDESC();
@@ -774,7 +775,7 @@ abstract class DatabaseModel implements JsonSerializable{
      * @throws InputValidationException
      */
     public static function exists(array $where = array()): bool{
-        self::validate($where, true);
+        self::validate($where, true, true);
         return self::getDBManager()->where($where)->exist();
     }
 
@@ -785,7 +786,7 @@ abstract class DatabaseModel implements JsonSerializable{
      * @throws InputValidationException
      */
     public static function delete_(array $where = array()): bool{
-        self::validate($where, true);
+        self::validate($where, true, true);
         self::getDBManager()->where($where)->delete();
         return true;
     }
