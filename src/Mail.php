@@ -56,7 +56,7 @@ class Mail{
             }
             return $mail->send();
         }catch(Exception $e){
-            error_log('Mail Error: ' . $e->getMessage());
+            error_log('INFO: Mail Error: ' . $e->getMessage());
             return false;
         }
     }
