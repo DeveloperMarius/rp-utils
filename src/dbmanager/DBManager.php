@@ -1046,7 +1046,7 @@ class DBManager{
             }catch(PDOException $e){
                 $query_ = $query;
                 foreach($bindings as $key => $value){
-                    $query_ = str_replace($key, $value, $query_);
+                    $query_ = str_replace($key, json_encode($value), $query_);
                 }
                 $code = $e->getCode();
                 if(!is_int($code))
