@@ -174,7 +174,7 @@ class Time extends DateTime implements \JsonSerializable{
             if($from === null)
                 $from = Time::getCurrentTimestamp(false);
             $maxTime = $from + ($days * 24 * 60 * 60);
-            return $this->getTimestamp() < $maxTime;
+            return $this->getTimestamp() <= $maxTime;
         }
         return false;
     }
