@@ -45,7 +45,7 @@ class APIResponse {
         return array(
             'success' => 'bool',
             'message' => 'string',
-            'data' => $data,
+            'data' => $data ?? array(),
             'meta' => array()
         );
     }
@@ -59,7 +59,7 @@ class APIResponse {
             'info' => 'string',
             'errors' => array(),
             'code' => 'integer',
-            'data' => $data
+            'data' => $data ?? array()
         );
     }
 
@@ -72,7 +72,7 @@ class APIResponse {
             'info' => 'string',
             'errors' => array(),
             'code' => 'integer',
-            'data' => $data,
+            'data' => $data ?? array(),
             'meta' => array(
                 'current_page' => 'integer',
                 'first_page' => 'integer',
