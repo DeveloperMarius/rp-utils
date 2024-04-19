@@ -12,4 +12,8 @@ class UnixTimestamp extends Time{
         return $this->getMilliseconds(true);
     }
 
+    public function __toString(): string{
+        return $this->getMilliseconds(true);
+    }
+
 }
