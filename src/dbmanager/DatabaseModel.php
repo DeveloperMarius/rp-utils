@@ -131,7 +131,7 @@ abstract class DatabaseModel implements JsonSerializable{
                         'bool' => $value !== null && in_array($value, array(0, 1, 'false', 'true')) ? in_array($value, array(1, 'true')) : null,
                         default => $value
                     };
-                }else if(!is_object($value)){
+                }else if(!is_object($value) && $value !== null){
                     $type_name = $property->getType()->getName();
                     try{
                         if(enum_exists($type_name)){
