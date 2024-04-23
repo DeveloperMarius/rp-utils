@@ -13,6 +13,8 @@ use JetBrains\PhpStorm\Pure;
 use PDO;
 use PDOException;
 use PDOStatement;
+use utils\dbmanager\types\DBTypeString;
+use utils\dbmanager\types\DBTypeText;
 use utils\exception\EntityNotFound;
 use utils\exception\SQLException;
 use utils\Util;
@@ -647,6 +649,7 @@ class DBManager{
                 $value = $where[$i];
                 if($value instanceof DBManagerOperator){
                     $param = $value->getValue();
+                    $column = $this->getTableStructure()?->getColumn($value->getKey());
                     if(is_array($param)){
                         if(!Util::isAssocArray($param)){
                             if($value->getOperator() === DBManagerOperator::OPERATOR_IN || $value->getOperator() === DBManagerOperator::OPERATOR_NOT_IN){
@@ -665,10 +668,10 @@ class DBManager{
                                     foreach($param as $sub_value){
                                         if($this->isSmartParser())
                                             $sub_value = (new DBSmartParser('__N/A__', $sub_value))->parse()->getValue();
-                                        $sub_bindings[':w_' . $i . '_' . $j] = ($ignorecase && is_string($sub_value) ? strtolower($sub_value) : $sub_value);
+                                        $sub_bindings[':w_' . $i . '_' . $j] = ($ignorecase && ($column->getType() instanceof DBTypeString || $column->getType() instanceof DBTypeText) && is_string($sub_value) ? strtolower($sub_value) : $sub_value);
                                         $j++;
                                     }
-                                    $where_string = ($ignorecase ? 'LOWER(' : '') . $this->escapeColumnName($value->getKey()) . ($ignorecase ? ')' : '') . ' ' . $value->getOperator() . ' (' . join(', ', array_keys($sub_bindings)) . ')';
+                                    $where_string = ($ignorecase && ($column->getType() instanceof DBTypeString || $column->getType() instanceof DBTypeText) ? 'LOWER(' : '') . $this->escapeColumnName($value->getKey()) . ($ignorecase && ($column->getType() instanceof DBTypeString || $column->getType() instanceof DBTypeText) ? ')' : '') . ' ' . $value->getOperator() . ' (' . join(', ', array_keys($sub_bindings)) . ')';
                                     $bindings = array_merge($bindings, $sub_bindings);
                                 }
                             } else {
@@ -679,15 +682,14 @@ class DBManager{
                         }
                     }else{
                         if($value->getValue() !== null){
-                            $column = $this->getTableStructure()?->getColumn($value->getKey());
                             $value_key = ':w_' . $i;
                             if($column !== null){
                                 $value_key = $column->transformInsertValueKey($value_key);
                             }
                             if($this->isSmartParser())
                                 $value->setValue((new DBSmartParser($value->getKey(), $value->getValue()))->parse()->getValue());
-                            $where_string = ($ignorecase ? 'LOWER(' : '') . $this->escapeColumnName($value->getKey()) . ($ignorecase ? ')' : '') . ' ' . $value->getOperator() . ' ' . $value_key;
-                            $bindings[':w_' . $i] = ($ignorecase && is_string($param) ? strtolower($param) : $param);
+                            $where_string = ($ignorecase && ($column->getType() instanceof DBTypeString || $column->getType() instanceof DBTypeText) ? 'LOWER(' : '') . $this->escapeColumnName($value->getKey()) . ($ignorecase && ($column->getType() instanceof DBTypeString || $column->getType() instanceof DBTypeText) ? ')' : '') . ' ' . $value->getOperator() . ' ' . $value_key;
+                            $bindings[':w_' . $i] = ($ignorecase && ($column->getType() instanceof DBTypeString || $column->getType() instanceof DBTypeText) && is_string($param) ? strtolower($param) : $param);
                         }else{
                             $where_string = $this->escapeColumnName($value->getKey()) . ' ' . $value->getOperator() . ' null';
                         }
