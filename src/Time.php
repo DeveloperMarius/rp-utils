@@ -361,6 +361,15 @@ class Time extends DateTime implements \JsonSerializable{
     }
 
     /**
+     * @param int $day
+     * @return Time
+     */
+    public function setDayOfMonth(int $day): Time{
+        $this->setDate($this->getYear(), $this->getMonth(), $day);
+        return $this;
+    }
+
+    /**
      * @param bool $pad
      * @return int|string
      */
@@ -406,6 +415,15 @@ class Time extends DateTime implements \JsonSerializable{
     }
 
     /**
+     * @param int $month
+     * @return Time
+     */
+    public function setMonth(int $month): Time{
+        $this->setDate($this->getYear(), $month, $this->getDay());
+        return $this;
+    }
+
+    /**
      * @return int
      */
     public function getYear(): int{
@@ -422,6 +440,15 @@ class Time extends DateTime implements \JsonSerializable{
         }else{
             $this->add(new DateInterval('P' . $years . 'Y'));
         }
+        return $this;
+    }
+
+    /**
+     * @param int $year
+     * @return Time
+     */
+    public function setYear(int $year): Time{
+        $this->setDate($year, $this->getMonth(), $this->getDay());
         return $this;
     }
 
