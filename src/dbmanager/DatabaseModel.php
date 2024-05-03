@@ -525,6 +525,8 @@ abstract class DatabaseModel implements JsonSerializable{
                 if(sizeof($attributes) === 0)
                     $vars[$key] = htmlspecialchars_decode($value);
             }
+            if(str_starts_with($key, '_') || $property->isStatic() || $property->isPrivate())
+                unset($vars[$key]);
         }
         if(!$cleanData){
             $vars['__type__'] = self::getModelName();
