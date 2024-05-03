@@ -6,7 +6,6 @@ use DateInterval;
 use DateTime;
 use DateTimeZone;
 use Exception;
-use JetBrains\PhpStorm\Internal\TentativeType;
 use JetBrains\PhpStorm\Pure;
 
 class Time extends DateTime implements \JsonSerializable{
@@ -192,11 +191,10 @@ class Time extends DateTime implements \JsonSerializable{
     }
 
     /**
-     * @param bool $timestamp
      * @return int
      */
-    public function getMicroseconds(bool $timestamp = false): int{
-        return $timestamp ? intval($this->getTimestamp() . $this->format('s.u')) : intval($this->format('u'));
+    public function getMicroseconds(): int{
+        return intval($this->format('u'));
     }
 
     /**
@@ -213,7 +211,7 @@ class Time extends DateTime implements \JsonSerializable{
      * @return int
      */
     public function getMilliseconds(bool $timestamp = false): int{
-        return $timestamp ? intval($this->getTimestamp() . $this->format('s0')) : intval($this->format('s'));
+        return $timestamp ? $this->getTimestamp()*1000 + intval($this->format('v')) : intval($this->format('v'));
     }
 
     /**
