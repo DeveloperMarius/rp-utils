@@ -340,9 +340,9 @@ abstract class DatabaseModel implements JsonSerializable{
                         $property_type_name = $property->getType()->getName();
                         if(class_exists($property_type_name)){
                             $type_class = new ReflectionClass($property_type_name);
-                            if($type_class instanceof UnixTimestamp){
+                            if($type_class->getName() === UnixTimestamp::class){
                                 $routeAttribute->setType('int');
-                            }else if($type_class instanceof Time){
+                            }else if($type_class->getName() === Time::class){
                                 $routeAttribute->setType('string');
                             }else if($type_class->isEnum()){
                                 $type_class = new \ReflectionEnum($property_type_name);
