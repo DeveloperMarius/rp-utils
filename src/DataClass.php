@@ -74,6 +74,9 @@ class DataClass implements \JsonSerializable{
                 continue;
 
             $value = $this->getValueByPath($new_data, $property_path);
+            //When value cannot be found, no mapping needs to happen
+            if($value === null)
+                continue;
             $this->unsetArrayValue($new_data, $property_path);
 
             $new_data[$new_key] = $value;
