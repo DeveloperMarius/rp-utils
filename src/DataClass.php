@@ -87,10 +87,14 @@ class DataClass implements \JsonSerializable{
 
                 if(is_array($value)) {
                     if (Util::isAssocArray($value)) {
+                        if(sizeof($value) === 0)
+                            continue;
                         $this->$key = $this->valueToObject($type, $value);
                     } else {
                         $entries = array();
                         foreach ($value as $valueEntry) {
+                            if(is_array($valueEntry) && sizeof($valueEntry) === 0)
+                                continue;
                             $entries[] = $this->valueToObject($type, $valueEntry);
                         }
                         $this->$key = $entries;
