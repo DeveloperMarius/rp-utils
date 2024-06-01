@@ -109,7 +109,7 @@ class DataClass implements \JsonSerializable{
     }
 
     private function valueToObject(string $className, mixed $value): mixed{
-        if(is_string($value) || is_numeric($value)) {
+        if(is_string($value) || is_numeric($value) || is_bool($value) || is_null($value)){
             $class = new \ReflectionClass($className);
             if ($class->isEnum()) {
                 $enum = new \ReflectionEnum($className);
@@ -129,8 +129,6 @@ class DataClass implements \JsonSerializable{
                     throw new \Exception($className . ' not found for name: ' . $value);
                 }
             }
-        }
-        if(is_array($value)){
             return new $className($value);
         }
         return $value;
